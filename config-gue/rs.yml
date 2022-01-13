@@ -1,0 +1,43 @@
+apiVersion: apps/v1
+kind: ReplicaSet
+metadata:
+  name: rs-nginx
+  labels:
+    version: 1.2.4
+  annotations:
+    description: ini adalah replica set yang udah full
+spec:
+  replicas: 3
+  selector:
+    # matchLabels:
+    #   app: nginx
+    # kita comment dulu machLabelsnya karna kita tidak pake itu karna mau nyoba marchExpressions
+    matchExpressions:
+      - key: app
+        operator: In
+        values:
+          - nginx
+          - server
+  template:
+    metadata:
+      name: server-nginx
+      labels:
+        app: server
+    spec:
+      nodeSelector:
+      # nodeSelector itu untuk pod ini mau dibikin di node mana. Nodenya harus punya label. cara buat label di node tinggal "kubectl label node namanode key:value"
+        ssd: "true"
+      containers:
+      - name: kontainer-nginx
+        image: nginx
+        ports:
+        - containerPort: 80
+        # readinessProbe:
+        #   httpGet:
+        #     path: /health
+        #     port: 80
+        #   initialDelaySeconds: 0
+        #   periodSeconds: 10
+        #   failureThreshold: 3
+        #   successThreshold: 1
+        #   timeoutSeconds: 1
